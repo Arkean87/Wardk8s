@@ -1,0 +1,23 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: wardk8s-validating-webhook
+webhooks:
+  - name: validate-pod.ward.io
+    rules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+        scope: "Namespaced"
+    clientConfig:
+      service:
+        namespace: wardk8s-system
+        name: wardk8s-webhook
+        path: /validate-pod
+        port: 443
+      caBundle: "Cg==" # To be replaced by the Makefile
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+    timeoutSeconds: 5
+    failurePolicy: Fail

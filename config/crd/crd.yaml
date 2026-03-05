@@ -1,0 +1,77 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: securitypolicies.ward.io
+spec:
+  group: ward.io
+  names:
+    kind: SecurityPolicy
+    listKind: SecurityPolicyList
+    plural: securitypolicies
+    singular: securitypolicy
+  scope: Cluster
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                mode:
+                  type: string
+                  enum: [Enforce, DryRun]
+                defaultAction:
+                  type: string
+                  enum: [Allow, Deny]
+                rules:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      match:
+                        type: object
+                        properties:
+                          namespaces:
+                            type: array
+                            items:
+                              type: string
+                          podLabels:
+                            type: object
+                            additionalProperties:
+                              type: string
+                          privileged:
+                            type: boolean
+                          hostNetwork:
+                            type: boolean
+                          runAsRoot:
+                            type: boolean
+                      action:
+                        type: string
+                        enum: [Allow, Deny]
+                      reason:
+                        type: string
+            status:
+              type: object
+              properties:
+                conditions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      status:
+                        type: string
+                      lastTransitionTime:
+                        type: string
+                        format: date-time
+                      reason:
+                        type: string
+                      message:
+                        type: string

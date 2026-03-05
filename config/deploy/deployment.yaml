@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: wardk8s-system
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wardk8s-controller
+  namespace: wardk8s-system
+  labels:
+    app: wardk8s
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wardk8s
+  template:
+    metadata:
+      labels:
+        app: wardk8s
+    spec:
+      containers:
+        - name: wardk8s
+          image: wardk8s:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9443
+              name: webhook
+            - containerPort: 8080
+              name: metrics
+            - containerPort: 8081
+              name: health
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8081
+            initialDelaySeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 10
+          volumeMounts:
+            - name: webhook-certs
+              mountPath: /tmp/k8s-webhook-server/serving-certs
+              readOnly: true
+      volumes:
+        - name: webhook-certs
+          secret:
+            secretName: wardk8s-webhook-certs
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wardk8s-webhook
+  namespace: wardk8s-system
+spec:
+  selector:
+    app: wardk8s
+  ports:
+    - port: 443
+      targetPort: 9443
+      protocol: TCP
