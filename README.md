@@ -1,6 +1,6 @@
-# WardK8s
+# WardK8s: Lightweight Security Policy Controller for Kubernetes
 
-A Kubernetes Security Policy Controller that enforces pod security through Validating Admission Webhooks, implementing a **Default Deny** model.
+WardK8s is a high-performance, Go-native admission controller designed for specific security enforcement within Kubernetes clusters. It demonstrates how to leverage the `controller-runtime` and `ValidatingAdmissionWebhooks` to build bespoke infrastructure tooling.
 
 ## What It Does
 
